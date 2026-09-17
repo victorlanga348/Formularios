@@ -19,7 +19,7 @@ A arquitetura orienta-se por três pilares inegociáveis:
 | Camada | Tecnologia Adotada | Justificação Técnica |
 | :--- | :--- | :--- |
 | **Backend** | **Node.js + NestJS (TypeScript)** | Modularidade corporativa orientada a injeção de dependência (`RulesEngineModule`, `FinanceiroModule`), facilitando testes unitários determinísticos do motor de regras. |
-| **Frontend** | **Next.js 14+ (App Router) + Tailwind CSS** | Server Components com streaming de layout, Route Handlers velozes, tipagem TypeScript ponta a ponta e UI com estética Dark Mode de alta legibilidade operacional. |
+| **Frontend** | **Next.js 14+ (App Router) + Tailwind CSS** | Server Components com streaming de layout, Route Handlers velozes, tipagem TypeScript ponta a ponta e UI com estética de alta legibilidade operacional. |
 | **Banco de Dados** | **PostgreSQL** | Integridade referencial forte, controle estrito de concorrência com transações ACID via `$transaction` do Prisma. |
 | **ORM / Acesso a Dados** | **Prisma Multi-Client** | Geração isolada de `PrismaInternalClient` (PostgreSQL local) e `PrismaExternalClient` (Banco Legado Read-Only). Elimina mapeamentos SQL manuais mantendo tipagem segura. |
 | **Geração de PDF** | **Serviço NestJS (`pdfmake` / `puppeteer-core`)** | Geração assíncrona de boletos e metadados com streaming de buffer para armazenamento em bucket/volume e persistência em `BoletoLog`. |
