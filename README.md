@@ -233,10 +233,11 @@ function calcularProximoSemestreLogico(aluno: HistoricoAluno): { ano: number; se
 
 * Se $(S_{\text{logico}} \pmod 2) \neq (\text{CicloAtivo} \pmod 2)$, o **Grupo 1 (Regulares)** permanece vazio. O estudante poderá cursar exclusivamente cadeiras em atraso no **Grupo 2** que correspondam à paridade atual.
 
-#### Regra 4.6 & 4.7 – Inscrição Híbrida e Desmarcação em Cascata
+#### Regra 4.6 & 4.7 – Inscrição Híbrida, Injeção Automática e Desmarcação em Cascata
 
 * **Grupo 1 (Regulares):** Cadeiras do $S_{\text{logico}}$. Apresentam-se marcadas e travadas por padrão (`checked = true, disabled = true`). Se uma cadeira possuir precedência não aprovada no histórico, ela é bloqueada (`bloqueada = true, checked = false`).
 * **Grupo 2 (Atrasadas):** Cadeiras reprovadas/pendentes de semestres anteriores que atendem à paridade corrente. Vêm marcadas, mas habilitadas para edição (`checked = true, disabled = false`).
+* **Injeção Automática por Precedência em Falta:** Quando uma cadeira do Grupo 1 estiver bloqueada por falta de precedência, o motor verifica se a disciplina precedente pertence à paridade do ciclo ativo. Caso pertença, a cadeira em falta é **injetada automaticamente no Grupo 2** marcada por padrão (`checked = true`), oportunizando a regularização imediata do pré-requisito.
 * **Cascata Direta:**
 
 $$\text{Desmarcar}(C_{\text{Atraso}} \in \text{Grupo 2}) \implies \forall C_{\text{Regular}} \in \text{Grupo 1} \mid C_{\text{Atraso}} \in \text{Precedencias}(C_{\text{Regular}}), \quad C_{\text{Regular}}.\text{checked} \leftarrow \text{false}$$
@@ -348,6 +349,8 @@ O repositório é governado pelas especificações detalhadas localizadas no dir
 ├── AGENTS.md                      # Protocolo operacional e diretrizes de desenvolvimento
 ├── GEMINI.md                      # Regras de governança do assistente
 ├── docs/
+│   ├── PRD.md                     # Documento de Definição de Produto e Arquitetura (Fonte da Verdade)
+│   ├── README.md                  # Índice mestre da documentação
 │   ├── documentation-governance.md # Matriz de impacto e governança documental
 │   ├── tasks/
 │   │   └── template.md            # Template oficial para especificação de tarefas/sprints

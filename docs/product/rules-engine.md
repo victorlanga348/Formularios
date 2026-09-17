@@ -69,6 +69,8 @@ function calcularProximoSemestreLogico(aluno: HistoricoAluno): { ano: number; se
 #### Grupo 2 (Atrasos Opcionais)
 - Cadeiras reprovadas ou não cursadas de semestres anteriores que atendem à paridade do ciclo ativo e não violam a barreira de ciclo.
 - **Comportamento Padrão:** Vêm pré-marcadas para incentivar regularização, mas habilitadas para edição (`checked = true, disabled = false`).
+- **Injeção Automática por Precedência em Falta:**
+  Quando uma cadeira do **Grupo 1** estiver bloqueada por falta de precedência, o motor verifica se a disciplina precedente pertence à paridade corrente do ciclo ativo. Caso pertença, a cadeira em falta é **injetada automaticamente no Grupo 2** marcada por padrão (`checked = true`), garantindo ao estudante a oportunidade de regularizar o pré-requisito no mesmo semestre letivo.
 
 #### Desmarcação em Cascata Direta
 Se o estudante desmarcar uma cadeira de atraso no Grupo 2 que seja pré-requisito de uma cadeira regular no Grupo 1, a cadeira dependente do Grupo 1 é compulsoriamente desmarcada e bloqueada:

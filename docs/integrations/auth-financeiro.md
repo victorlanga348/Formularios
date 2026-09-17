@@ -90,6 +90,12 @@ async function verificarTravaFinanceira(codigoEstudante: string): Promise<ClaimA
 }
 ```
 
+### 3.3 Política Estrita de Fail-Closed no Circuit Breaker
+Se o Banco Externo estiver inacessível e **não houver** registro prévio em `PendenciaCache`, o sistema adota a postura estrita de **Fail-Closed**:
+- O avanço para a matrícula é bloqueado por omissão, emitindo a claim `SOMENTE_BOLETO`.
+- A interface instrui o estudante a tentar mais tarde ou procurar a secretaria acadêmica.
+- Em hipótese alguma o acesso `LIVRE` é concedido por indisponibilidade ou ausência de resposta da rede externa.
+
 ---
 
 ## 4. Endpoints REST do Módulo

@@ -25,15 +25,15 @@ Projetado para reduzir fadiga visual e proporcionar foco contínuo no fluxo de s
 
 ```css
 .dark {
-  --bg-app: #0c0a17;              /* Fundo profundo com matiz violeta escuro */
-  --bg-surface: #17132a;          /* Superfície de tabelas, painéis e cartões */
-  --bg-surface-elevated: #211c3d; /* Modais, dropdowns e tooltips flutuantes */
-  --border-subtle: #312a56;       /* Bordas de inputs e separadores */
+  --bg-app: #0a0f1a;              /* Fundo Dark Mode Premium oficial */
+  --bg-surface: #111b2d;          /* Painéis, cartões e superfícies de tabela */
+  --bg-surface-elevated: #18253e; /* Modais, dropdowns e tooltips flutuantes */
+  --border-subtle: #1e293b;       /* Bordas de inputs e divisórias sutis */
   --border-highlight: #5b2be0;    /* Bordas de cartões com seleção ativa */
   
-  --text-primary: #f8fafc;        /* Títulos, valores de taxas e textos de destaque */
-  --text-secondary: #c4b5fd;      /* Rótulos e descrições com tonalidade lavanda suave */
-  --text-muted: #94a3b8;          /* Metadados, códigos de cadeira e dicas secundárias */
+  --text-primary: #ffffff;        /* Destaques em branco e valores de taxas */
+  --text-secondary: #cbd5e1;      /* Cinza visível para rótulos e títulos secundários */
+  --text-muted: #64748b;          /* Cinza escuro / metadados e base da animação de digitação */
 
   --status-success: #10b981;      /* Confirmação e validação regularizada */
   --status-warning: #f59e0b;      /* Advertências e pendências não impeditivas */
@@ -85,3 +85,10 @@ Espelha o layout tradicional do portal de gestão acadêmica:
   - **Regular Obrigatório:** Marcado e travado (`bg-[#5b2be0] opacity-75 cursor-not-allowed`)
   - **Atraso Interativo:** Selecionável (`accent-[#5b2be0] cursor-pointer`)
   - **Bloqueado por Precedência:** Desmarcado e desabilitado com badge vermelho (`#ef4444`)
+
+---
+
+## 6. Animação de Texto: Scroll-Typing Reveal
+Para blocos narrativos institucionais, "História Acadêmica" ou "Resumo da Matrícula":
+- **Comportamento Visual:** Os caracteres iniciam em cinza escuro (`#334155` / `--text-muted`) e fazem a transição progressiva para branco puro (`#FFFFFF` / `--text-primary`) simulando um efeito de digitação guiado pelo scroll vertical da janela.
+- **Implementação Técnica:** Via Intersection Observer / Scroll Progress (Framer Motion ou CSS `animation-timeline: scroll()`), aplicando interpolação contínua de opacidade/cor por span de caractere ou palavra.

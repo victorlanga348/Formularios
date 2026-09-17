@@ -16,6 +16,7 @@ Bem-vindo ao centro oficial de especificações técnicas, contratos de dados, d
 ├── README.md                          # Visão geral consolidada, esquemas e regras
 └── docs/
     ├── README.md                      # Este índice mestre
+    ├── PRD.md                         # Documento de Definição de Produto e Arquitetura (Fonte da Verdade)
     ├── documentation-governance.md    # Matriz de impacto, trilhas de equipa e checklist de sprint
     │
     ├── architecture/                  # Stack, infraestrutura e esquemas de dados
@@ -64,6 +65,7 @@ Bem-vindo ao centro oficial de especificações técnicas, contratos de dados, d
 
 ## 2. Guias de Governança e Processo
 
+- [docs/PRD.md](file:///C:/Users/victo/OneDrive/Documentos/Github/Formularios/docs/PRD.md) — Documento de Especificação Técnica e Definição de Produto (Fonte da Verdade Definitiva).
 - [AGENTS.md](file:///C:/Users/victo/OneDrive/Documentos/Github/Formularios/AGENTS.md) — Regras invioláveis para desenvolvimento agentic e desenvolvedores humanos.
 - [docs/documentation-governance.md](file:///C:/Users/victo/OneDrive/Documentos/Github/Formularios/docs/documentation-governance.md) — Matriz de Impacto e Checklist de encerramento de tarefas.
 - [docs/tasks/template.md](file:///C:/Users/victo/OneDrive/Documentos/Github/Formularios/docs/tasks/template.md) — Template padrão para criação de tarefas (`/docs/tasks/YYYY-MM-DD-nome-da-tarefa.md`).
