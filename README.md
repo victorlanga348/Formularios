@@ -66,14 +66,16 @@ As validações são processadas de forma encadeada no backend (`RulesEngineServ
 ```
 
 #### Regra 4.1 – Prioridade 0: Trava Financeira
+Alunos com dividas não poderão acessar e nem realizar nada enquanto estiverem com dívidas.
 
 #### Regra 4.2 – Validação de Calouro
+Alunos de 1 ano do 1 semestre nao poderão fazer a inscrição nesse ssitemas, até agora nessa fase é só presencial.
 
 #### Regra 4.3 – Paridade Estrita
 
 O portal opera em regime de semestres **Ímpares (1)** ou **Pares (2)**. Cadeiras fora da paridade ativa são suprimidas na raiz da árvore de decisão:
 
-#### Regra 4.4 – Barreira de Ciclo (Hard Stop)
+#### Regra 4.4 – Barreira de Ciclo
 
 Bloqueia verticalmente a transição de ciclo antes da conclusão total das etapas base:
 
@@ -81,7 +83,7 @@ Bloqueia verticalmente a transição de ciclo antes da conclusão total das etap
 * Para ofertar cadeiras do **4º Ano**: $100\%$ das cadeiras do **2º Ano** devem constar como `APROVADO` no histórico.
 * Caso a condição não seja atendida, o aluno não tem acesso a cadeiras do ciclo avançado, ficando restrito a regularizar pendências.
 
-#### Regra 4.5 – Próximo Passo Lógico (PPL)
+#### Regra 4.5 – Próximo Passo Lógico
 
 #### Regra 4.6 & 4.7 – Inscrição Híbrida, Injeção Automática e Desmarcação em Cascata
 
