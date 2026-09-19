@@ -167,8 +167,6 @@ As validações são processadas de forma encadeada no backend (`RulesEngineServ
 
 O portal opera em regime de semestres **Ímpares (1)** ou **Pares (2)**. Cadeiras fora da paridade ativa são suprimidas na raiz da árvore de decisão:
 
-$$\text{CadeirasElegiveis} = \{ c \in \text{Catalogo} \mid (c.\text{semestre} \pmod 2) \equiv (\text{CicloAtivo} \pmod 2) \}$$
-
 #### Regra 4.4 – Barreira de Ciclo (Hard Stop)
 
 Bloqueia verticalmente a transição de ciclo antes da conclusão total das etapas base:
@@ -179,16 +177,12 @@ Bloqueia verticalmente a transição de ciclo antes da conclusão total das etap
 
 #### Regra 4.5 – Próximo Passo Lógico (PPL)
 
-* Se $(S_{\text{logico}} \pmod 2) \neq (\text{CicloAtivo} \pmod 2)$, o **Grupo 1 (Regulares)** permanece vazio. O estudante poderá cursar exclusivamente cadeiras em atraso no **Grupo 2** que correspondam à paridade atual.
-
 #### Regra 4.6 & 4.7 – Inscrição Híbrida, Injeção Automática e Desmarcação em Cascata
 
-* **Grupo 1 (Regulares):** Cadeiras do $S_{\text{logico}}$. Apresentam-se marcadas e travadas por padrão (`checked = true, disabled = true`). Se uma cadeira possuir precedência não aprovada no histórico, ela é bloqueada (`bloqueada = true, checked = false`).
-* **Grupo 2 (Atrasadas):** Cadeiras reprovadas/pendentes de semestres anteriores que atendem à paridade corrente. Vêm marcadas, mas habilitadas para edição (`checked = true, disabled = false`).
+* **Grupo 1 (Regulares):** As Cadeiras Apresentam-se marcadas e travadas por padrão (`checked = true, disabled = true`). Se uma cadeira possuir precedência não aprovada no histórico, ela é bloqueada (`bloqueada = true, checked = false`).
+* **Grupo 2 (Atrasadas):** As Cadeiras reprovadas/pendentes de semestres anteriores que atendem à paridade corrente. Vêm marcadas, mas habilitadas para edição (`checked = true, disabled = false`).
 * **Injeção Automática por Precedência em Falta:** Quando uma cadeira do Grupo 1 estiver bloqueada por falta de precedência, o motor verifica se a disciplina precedente pertence à paridade do ciclo ativo. Caso pertença, a cadeira em falta é **injetada automaticamente no Grupo 2** marcada por padrão (`checked = true`), oportunizando a regularização imediata do pré-requisito.
 * **Cascata Direta:**
-
-$$\text{Desmarcar}(C_{\text{Atraso}} \in \text{Grupo 2}) \implies \forall C_{\text{Regular}} \in \text{Grupo 1} \mid C_{\text{Atraso}} \in \text{Precedencias}(C_{\text{Regular}}), \quad C_{\text{Regular}}.\text{checked} \leftarrow \text{false}$$
 
 ---
 
@@ -222,13 +216,6 @@ Para viabilizar o desenvolvimento colaborativo de forma paralela e sem conflitos
 * **Trilha A (Backend & Persistência):** Responsável por schemas Prisma, migrations, NestJS modules, autenticação, transações ACID e geração de PDFs.
 * **Trilha B (Motor de Regras & Algoritmos):** Responsável pela implementação pura de `RulesEngineService`, testes unitários exaustivos do motor, cálculo de taxas e simulação.
 * **Trilha C (Frontend & Experiência do Aluno):** Responsável por Next.js App Router, Tailwind Dark Mode, Zustand, componentes acessíveis, integração de APIs e testes E2E.
-
-#### Estrutura de Branches e Colaboração
-- `main`: Código em produção, sempre estável e testado.
-- `develop`: Branch de integração contínua do time.
-- `feat/<sprint>-<trilha>-<funcionalidade>` (ex: `feat/sprint-1-backend-prisma-schemas`, `feat/sprint-3-frontend-tabelas-selecao`).
-- Pull Requests obrigatórios para merge em `develop`, contendo aprovação de pelo menos um par do time e execução de testes via `rtk`.
-- Mensagens de commit padronizadas em português (ex: `feat: adicionar circuit breaker opossum no modulo financeiro`).
 
 ---
 
