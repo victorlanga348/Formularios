@@ -161,47 +161,7 @@ As validações são processadas de forma encadeada no backend (`RulesEngineServ
 
 #### Regra 4.1 – Prioridade 0: Trava Financeira
 
-Executada imediatamente na autenticação:
-
-```typescript
-async function verificarTravaFinanceira(codigoEstudante: string): Promise<ClaimAcesso> {
-  try {
-    const saldoExterno = await circuitBreaker.fire(codigoEstudante); // Consulta PrismaExternal
-    await prismaInternal.pendenciaCache.upsert({
-      where: { estudanteCodigo: codigoEstudante },
-      create: { estudanteCodigo: codigoEstudante, ultimoSaldoConhecido: saldoExterno, emFallback: false },
-      update: { ultimoSaldoConhecido: saldoExterno, emFallback: false }
-    });
-
-    if (saldoExterno > 0) {
-      return ClaimAcesso.SOMENTE_BOLETO;
-    }
-
-    // Sincronização e Efetivação Automática Pós-Pagamento
-    await prismaInternal.inscricaoPendente.updateMany({
-      where: { estudanteCodigo: codigoEstudante, status: InscricaoStatus.PENDENTE },
-      data: { status: InscricaoStatus.EFECTIVADA }
-    });
-
-    return ClaimAcesso.LIVRE;
-  } catch (error) {
-    // Fallback Conservador: Nunca liberar por omissão
-    const cache = await prismaInternal.pendenciaCache.findUnique({ where: { estudanteCodigo: codigoEstudante } });
-    if (!cache || cache.ultimoSaldoConhecido.toNumber() > 0) {
-      return ClaimAcesso.SOMENTE_BOLETO;
-    }
-    return ClaimAcesso.SOMENTE_BOLETO; // Política de fail-closed
-  }
-}
-```
-
 #### Regra 4.2 – Validação de Calouro
-
-```typescript
-if (aluno.anoCurricularAtual === 1 && aluno.semestreCurricularAtual === 1) {
-  throw new ForbiddenException("Matrícula de calouros é manual. Dirija-se à secretaria acadêmica.");
-}
-```
 
 #### Regra 4.3 – Paridade Estrita
 
@@ -218,18 +178,6 @@ Bloqueia verticalmente a transição de ciclo antes da conclusão total das etap
 * Caso a condição não seja atendida, o aluno não tem acesso a cadeiras do ciclo avançado, ficando restrito a regularizar pendências.
 
 #### Regra 4.5 – Próximo Passo Lógico (PPL)
-
-Veda a progressão arbitrária entre semestres curriculares. O próximo semestre acadêmico teórico ($S_{\text{logico}}$) é derivado sequencialmente a partir do último semestre concluído com êxito:
-
-```typescript
-function calcularProximoSemestreLogico(aluno: HistoricoAluno): { ano: number; semestre: number } {
-  const { ultimoAnoConcluido, ultimoSemestreConcluido } = aluno;
-  if (ultimoSemestreConcluido === 1) {
-    return { ano: ultimoAnoConcluido, semestre: 2 };
-  }
-  return { ano: ultimoAnoConcluido + 1, semestre: 1 };
-}
-```
 
 * Se $(S_{\text{logico}} \pmod 2) \neq (\text{CicloAtivo} \pmod 2)$, o **Grupo 1 (Regulares)** permanece vazio. O estudante poderá cursar exclusivamente cadeiras em atraso no **Grupo 2** que correspondam à paridade atual.
 
