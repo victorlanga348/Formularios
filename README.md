@@ -1,4 +1,4 @@
-# Sistema de Matrícula e Inscrição Académica (Consolidado e Retificado)
+# Sistema de Matrícula e Inscrição
 
 ---
 
@@ -14,7 +14,7 @@ A arquitetura orienta-se por três pilares inegociáveis:
 
 ---
 
-### 1. Stack Tecnológica Oficial (Retificada)
+### 1. Stack Tecnológica
 
 | Camada | Tecnologia Adotada | Justificação Técnica |
 | :--- | :--- | :--- |
@@ -30,109 +30,14 @@ A arquitetura orienta-se por três pilares inegociáveis:
 
 ### 2. Modelo de Dados
 
-#### 2.1 Banco Externo (Referência Read-Only via `PrismaExternal`)
+#### 2.1 Banco Externo
+Usado como fonte das verificações para teste.
 
-Mapeado de forma estrita para consulta de validação de calouro e débitos financeiros:
-
-* `alunos_externo`: `(id, codigo_estudante, senha_hash, ano_ingresso, ano_curricular_atual, semestre_curricular_atual, status)`.
-* `historico_externo`: `(id, aluno_id, cadeira_id, resultado, ano_lectivo)`.
-* `contas_correntes`: `(id, aluno_id, saldo_devedor, atualizado_em)`.
-
-#### 2.2 Banco Interno (Esquema PostgreSQL Oficial via `PrismaInternal`)
-
-```prisma
-datasource db {
-  provider = "postgresql"
-  url      = env("INTERNAL_DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
-  output   = "../node_modules/@prisma/client-internal"
-}
-
-enum ClaimAcesso {
-  SOMENTE_BOLETO
-  LIVRE
-}
-
-enum InscricaoStatus {
-  PENDENTE
-  EFECTIVADA
-  CANCELADA
-}
-
-enum GrupoOrigem {
-  REGULAR
-  ATRASO
-}
-
-model EstudanteSessao {
-  id              String             @id @default(uuid())
-  estudanteCodigo String             @unique
-  claimAcesso     ClaimAcesso
-  ultimoLogin     DateTime           @default(now())
-  createdAt       DateTime           @default(now())
-  inscricoes      InscricaoPendente[]
-  pendenciaCache  PendenciaCache?
-
-  @@index([estudanteCodigo])
-}
-
-model PendenciaCache {
-  id                   String          @id @default(uuid())
-  estudanteCodigo      String          @unique
-  ultimoSaldoConhecido Decimal         @db.Decimal(12, 2)
-  emFallback           Boolean         @default(false)
-  atualizadoEm         DateTime        @updatedAt
-  estudanteSessao      EstudanteSessao @relation(fields: [estudanteCodigo], references: [estudanteCodigo], onDelete: Cascade)
-}
-
-model InscricaoPendente {
-  id                 String          @id @default(uuid())
-  estudanteCodigo    String
-  estudanteSessaoId  String
-  semestreReferencia String          // Ex: "2026.1"
-  status             InscricaoStatus @default(PENDENTE)
-  valorTotal         Decimal         @db.Decimal(12, 2)
-  idempotencyKey     String          @unique
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-
-  estudanteSessao    EstudanteSessao @relation(fields: [estudanteSessaoId], references: [id])
-  itens              InscricaoItem[]
-  boleto             BoletoLog?
-
-  @@index([estudanteCodigo, status])
-}
-
-model InscricaoItem {
-  id                  String            @id @default(uuid())
-  inscricaoPendenteId String
-  cadeiraId           Int
-  grupoOrigem         GrupoOrigem
-  taxaAplicada        Decimal           @db.Decimal(12, 2)
-
-  inscricao           InscricaoPendente @relation(fields: [inscricaoPendenteId], references: [id], onDelete: Cascade)
-
-  @@index([inscricaoPendenteId])
-}
-
-model BoletoLog {
-  id                  String            @id @default(uuid())
-  inscricaoPendenteId String            @unique
-  codigoBarras        String
-  pdfPath             String
-  geradoEm            DateTime          @default(now())
-  expiraEm            DateTime
-
-  inscricao           InscricaoPendente @relation(fields: [inscricaoPendenteId], references: [id], onDelete: Cascade)
-}
-```
-
+#### 2.2 Banco Interno
+O banco real do projecto que vai guardar os estudantes matriculados com sucesso.
 ---
 
-### 3. Motor de Regras – Especificação Algorítmica Oficial
+### 3. Motor de Regras
 
 As validações são processadas de forma encadeada no backend (`RulesEngineService`). Qualquer incoerência aborta a montagem ou o submit da matrícula.
 
@@ -186,20 +91,7 @@ Bloqueia verticalmente a transição de ciclo antes da conclusão total das etap
 
 ---
 
-### 4. Endpoints REST Oficiais (NestJS Controllers)
-
-| Método | Rota | Payload / Headers | Resposta | Descrição |
-| :--- | :--- | :--- | :--- | :--- |
-| `POST` | `/auth/login` | `{ codigo, senha }` | `{ accessToken, claimAcesso, aluno }` | JWT com claims de acesso (`SOMENTE_BOLETO` ou `LIVRE`) |
-| `GET` | `/financeiro/pendencia` | `Bearer Token` | `{ saldoDevedor, boletoLiquidacaoUrl, emFallback }` | Consulta de saldo devedor e link de regularização |
-| `GET` | `/matricula/opcoes` | `Bearer Token` | `{ cicloAtivo, grupo1: [], grupo2: [] }` | Listagem das cadeiras elegíveis divididas em Grupo 1 e 2 |
-| `POST` | `/matricula/simular` | `{ cadeirasIds: number[] }` | `{ valorTotal, itensValidos, advertencias: [] }` | Simulação em tempo real com recálculo determinístico |
-| `POST` | `/matricula/submeter` | Header: `Idempotency-Key`<br>Payload: `{ cadeirasIds: number[] }` | `{ matriculaId, boletoUrl, status, total }` | Criação atômica da matrícula pendente com transação ACID |
-| `GET` | `/matricula/:id/boleto` | `Bearer Token` | Stream do PDF (`application/pdf`) | Download/stream do documento e boleto emitido |
-
----
-
-### 5. Comportamento da Interface Web (Next.js App Router)
+### 4. Comportamento da Interface Web (Next.js App Router)
 
 * **Layout e Proteção de Rota:** `middleware.ts` intercepta as requisições via JWT. Estudantes com `acesso: "SOMENTE_BOLETO"` são redirecionados compulsoriamente para `/divida/liquidar`, sem acesso às rotas de `/matricula/*`.
 * **Grupo 1 (Regulares):** Tabela superior. Cadeiras válidas exibem `checkbox` selecionado e desabilitado. Cadeiras com precedência ausente exibem badge visual vermelho, ícone de cadeado e tooltip explicativo.
@@ -209,7 +101,7 @@ Bloqueia verticalmente a transição de ciclo antes da conclusão total das etap
 
 ---
 
-### 6. Organização do Trabalho em Grupo e Divisão em Sprints
+### 5. Organização do Trabalho em Grupo e Divisão em Sprints
 
 Para viabilizar o desenvolvimento colaborativo de forma paralela e sem conflitos de branch, as tarefas são organizadas em **3 Trilhas de Trabalho Paralelas (Tracks)** distribuídas pelas semanas de sprint:
 
@@ -271,27 +163,3 @@ Auditoria E2E     [DoD: Reconciliação 100%]     [DoD: 0 vulnerabilidades]     
 | **Submissão Duplicada de Matrícula (Duplo Clique / Retry)** | Alta | Criação de inscrições duplicadas e cobrança em duplicidade. | Uso de constraint única no banco interno via `idempotencyKey` enviada pelo cliente no cabeçalho HTTP. Retentativas recebem a resposta original em cache sem reinserção. |
 | **Discrepância na Efetivação Financeira** | Média | Aluno paga no banco legado, mas o sistema interno não é notificado por falta de webhook. | A conciliação é desacoplada de webhooks frágeis; toda tentativa subsequente de autenticação executa `verificarTravaFinanceira`, promovendo a transição atômica de `PENDENTE` para `EFECTIVADA`. |
 | **Conflitos de Merge em Desenvolvimento em Grupo** | Média | Trabalho paralelo de múltiplos membros sobrescrevendo regras ou contratos. | Divisão rígida de trilhas (Backend, Motor, Frontend), uso de contratos de DTO tipados via TypeScript compartilhados, e branch protections com PR obrigatório. |
-
----
-
-### 8. Estrutura do Repositório e Documentação
-
-O repositório é governado pelas especificações detalhadas localizadas no diretório `/docs`:
-
-```
-/
-├── README.md                      # Fonte oficial mestre de arquitetura e cronograma
-├── AGENTS.md                      # Protocolo operacional e diretrizes de desenvolvimento
-├── GEMINI.md                      # Regras de governança do assistente
-├── docs/
-│   ├── PRD.md                     # Documento de Definição de Produto e Arquitetura (Fonte da Verdade)
-│   ├── README.md                  # Índice mestre da documentação
-│   ├── documentation-governance.md # Matriz de impacto e governança documental
-│   ├── tasks/
-│   │   └── template.md            # Template oficial para especificação de tarefas/sprints
-│   └── specs/
-│       ├── auth-e-financeiro.md   # Especificação do AuthModule, Circuit Breaker e Trava P0
-│       ├── motor-de-regras.md     # Especificação do RulesEngineService e regras P1 a P5
-│       ├── api-matricula.md       # Contratos de rotas REST, DTOs e transações ACID
-│       └── ui-fluxo-estudante.md  # Especificação da interface Next.js, Zustand e acessibilidade
-```
