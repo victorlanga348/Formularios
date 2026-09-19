@@ -84,7 +84,7 @@ Bloqueia verticalmente a transição de ciclo antes da conclusão total das etap
 * Caso a condição não seja atendida, o aluno não tem acesso a cadeiras do ciclo avançado, ficando restrito a regularizar pendências.
 
 #### Regra 4.5 – Próximo Passo Lógico
-Os alunos não vão poder pular semestres, ex: um aluno que fez 1 ano 2 semestre e quere fazer isncrição para 2 ano e 2 semestre vai ser barrado pois ainda não concluiu o 2 ano 1 semestre.
+Os alunos não vão poder pular semestres, ex: um aluno que fez 1 ano 2 semestre e quer fazer isncrição para 2 ano e 2 semestre vai ser barrado pois ainda não concluiu o 2 ano 1 semestre.
 
 #### Regra 4.6 & 4.7 – Inscrição Híbrida, Injeção Automática e Desmarcação em Cascata
 
