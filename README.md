@@ -1,4 +1,4 @@
-# Sistema de Matrícula e Inscrição
+# Sistema de Inscrição
 
 ---
 
